@@ -32,6 +32,7 @@ function updateCharts(data) {
 const ctxSalesTime = document.getElementById('sales-time-chart').getContext('2d');
 const ctxSalesDay = document.getElementById('sales-day-chart').getContext('2d');
 
+
 const salesTimeChart = new Chart(ctxSalesTime, {
   type: 'line',
   data: {
@@ -84,6 +85,7 @@ async function loadSalesData() {
   const data = await response.json();
   return data;
 }
+
 
 // Variabel untuk melacak indeks awal dan akhir data yang ditampilkan
 let startIndex = 0;
@@ -155,13 +157,106 @@ document.addEventListener("DOMContentLoaded", () => {
   fillSalesTable();
 });
 
+// Fungsi untuk mengolah data penjualan per bulan
+async function processMonthlySalesData() {
+  const rawData = await loadSalesData();
+  const salesData = {};
+
+  rawData.forEach((item) => {
+    const [day, month, year] = item.transaction_date.split("/");
+    const dateKey = `${year}-${month.padStart(2, "0")}`; // Membuat key dengan format 'YYYY-MM'
+
+    const quantity = parseInt(item.transaction_qty);
+    const unitPrice = parseFloat(item.unit_price.replace("$", ""));
+    const totalSales = parseFloat(item.total_usd.replace("$", ""));
+
+    if (salesData[dateKey]) {
+      salesData[dateKey] += totalSales;
+    } else {
+      salesData[dateKey] = totalSales;
+    }
+  });
+
+  const labels = Object.keys(salesData).sort(); // Mengurutkan berdasarkan tanggal
+  const data = labels.map((label) => salesData[label]);
+
+  return { labels, data };
+}
 
 
 // Fungsi untuk menginisialisasi chart dengan data dari JSON
-async function initChart() {}
+async function initChart() {
+  const chartData = await processMonthlySalesData();
+  
+    const salesData = {
+      labels: chartData.labels,
+      datasets: [
+        {
+          label: "Revenue",
+          data: chartData.data,
+          backgroundColor: "rgba(182, 137, 91, 0.2)",
+          borderColor: "rgba(182, 137, 91, 1)",
+          borderWidth: 1,
+          fill: true,
+          tension: 0.4,
+        },
+      ],
+    };
+  
+    const config = {
+      type: "line",
+      data: salesData,
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    };
+  
+    const salesChart = new Chart(document.getElementById("revenue"), config);
+}
+
 
 // Panggil fungsi untuk menginisialisasi chart saat halaman dimuat
 document.addEventListener("DOMContentLoaded", initChart);
 
+// total revenue
+$(document).ready(function(){
+  $.getJSON('data.json', function(data) {
+    var totalRevenue = 0;
+    $.each(data, function(index, item) {
+      var unit_price = parseFloat(item.unit_price.replace(',', '.'));
+      var transaction_qty = parseFloat(item.transaction_qty.replace(',', '.'));
+      totalRevenue += unit_price * item.transaction_qty;
+    });
+    $('#totalRevenue').text('$' + totalRevenue.toFixed(2));
+  });
+});
+
+// total transaction
+$(document).ready(function(){
+  $.getJSON('data.json', function(data) {
+    var totalTransaksi = 0;
+    $.each(data, function(index, item) {
+      var transactionQty = parseFloat(item.transaction_qty.replace(',', '.'));
+      totalTransaksi += transactionQty;
+    });
+    $('#totalTransaksi').text(totalTransaksi.toFixed(2));
+  });
+});
 
 
+//total customer
+$(document).ready(function(){
+  $.getJSON('data.json', function(data) {
+    var uniqueOrderIds = {}; 
+    $.each(data, function(index, item) {
+      uniqueOrderIds[item.transaction_id] = true; 
+    });
+    var totalOrders = Object.keys(uniqueOrderIds).length; 
+    $('#totalOrders').text(totalOrders);
+  });
+});
