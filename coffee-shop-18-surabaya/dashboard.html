@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coffee Shop Report</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <img src="img/coffee.png" alt="Coffee Icon" />
+      </div>
+      <div class="summary">
+        <h1 class="summary-text">Coffee Shop Report</h1>
+        <div class="box" id="totalRevenueBox">
+          <h2>Revenue</h2>
+          <p id="totalRevenue"></p>
+          <img src="img/revenue.png" alt="Revenue Icon" />
+        </div>
+        <div class="box">
+          <h2>Transaction</h2>
+          <p id="totalTransaksi"></p>
+          <img src="img/coffee-cup.png" alt="Transaction Icon" />
+        </div>
+        <div class="box">
+          <h2>Customer</h2>
+          <p id="totalOrders"></p>
+          <img src="img/people.png" alt="Customer Icon" />
+        </div>
+      </div>
+      <div class="content">
+        <div class="section">
+          <h2>Store</h2>
+          <div>
+            <select id="orderSelect">
+              <option value="desc">Descending</option>
+              <option value="asc">Ascending</option>
+            </select>
+          </div>
+          <div class="search-container">
+            <label for="search">Search Store:</label>
+            <input type="text" id="search" name="search" placeholder="Type to search" list="storeList" />
+            <datalist id="storeList">
+              <option value="Astoria">
+              <option value="Hell's Kitchen">
+              <option value="Lower Manhattan">
+            </datalist>
+          </div>
+          <div class="chart-container">
+            <canvas id="pieChart"></canvas>
+          </div>
+          <form>
+            <div class="form-container">
+              <label for="store_location">
+                <div class="checkbox-wrapper"><input type="checkbox" name="store_location" value="store_location" checked />store_location</div>
+                <span class="static-text-usd">total_usd</span>
+              </label>
+              <input type="text" id="search" name="search" placeholder="Type to search" />
+              <div class="filter-box">
+                <label for="hells_kitchen">
+                  <div class="checkbox-wrapper"><input type="checkbox" name="hells_kitchen" value="hells_kitchen" unchecked /> Hell's Kitchen</div>
+                  <span class="static-text">236.5K</span>
+                </label>
+                <label for="astoria">
+                  <div class="checkbox-wrapper"><input type="checkbox" name="astoria" value="astoria" checked /> Astoria</div>
+                  <span class="static-text-astoria">232.2K</span>
+                </label>
+                <label for="lower">
+                  <div class="checkbox-wrapper"><input type="checkbox" name="lower_manhattan" value="lower_manhattan" checked /> Lower Manhattan</div>
+                  <span class="static-text-lower">230.1K</span>
+                </label>
+              </div>
+            </div>
+          </form>
+          <h2>Menu</h2>
+          <form>
+            <div class="form-container">
+              <label for="store_location">
+                <div class="checkbox-wrapper-product"><input type="checkbox" name="product" value="product" checked />product_category</div>
+                <span class="static-text-transcation">transaction_id</span>
+              </label>
+              <input type="text" id="search" name="search" placeholder="Type to search" />
+              <div class="filter-box">
+                <label for="coffe">
+                  <div class="checkbox-wrapper"><input type="checkbox" name="coffe" value="coffe" unchecked /> Coffe</div>
+                  <span class="static-text-coffe">4.4B</span>
+                </label>
+                <label for="tea">
+                  <div class="checkbox-wrapper"><input type="checkbox" name="tea" value="tea" checked /> Tea</div>
+                  <span class="static-text-tea">3.4B</span>
+                </label>
+                <label for="bakkery">
+                  <div class="checkbox-wrapper"><input type="checkbox" name="bakkery" value="bakkery" unchecked /> Bakkery</div>
+                  <span class="static-text-bakkery">1.7B</span>
+                </label>
+              </div>
+            </div>
+          </form>
+          <div class="brand">
+            <img src="img/coffee.png" alt="Coffee Icon" />
+          </div>
+          <span class="text-brand">team18.tabyrevou@gmail.com</span>
+          <a href="index.html" class="button">Home</a>
+        </div>
+
+        <div class="section-chart">
+          <div class="chart-container">
+            <div class="chart-text-1">Sales Distribution at Several Times</div>
+            <canvas id="coffeeSalesPerHourChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <div class="chart-text-1">Sales Distribution in Each Day</div>
+            <canvas id="transactionsQtyPerDayChart"></canvas>
+          </div>
+          <div class="container-horizontal">
+            <h3>Sales Distribution at Each Branch based on Product Type</h3>
+            <canvas id="horizontalStackedBarAreaChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <div class="chart-text">Sales Distribution of Product Types</div>
+            <canvas id="myChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <div class="chart-text">Revenue Distribution of Product Types</div>
+            <canvas id="myChart1"></canvas>
+          </div>
+          <!-- <div id="chartContainer">
+            <canvas id="pieChart"></canvas>
+          </div> -->
+          <div class="container-revenue">
+            <h3>Revenue</h3>
+            <canvas id="revenue"></canvas>
+          </div>
+          <!-- section table -->
+          <section class="table">
+            <div class="table">
+              <table id="salesTable">
+                <thead>
+                  <tr>
+                    <th>transaction id</th>
+                    <th>transaction date</th>
+                    <th>transaction day</th>
+                    <th>transaction time</th>
+                    <th>transaction time hour</th>
+                    <th>transaction qty</th>
+                    <th>store id</th>
+                    <th>store location</th>
+                    <th>product id</th>
+                    <th>unit price</th>
+                    <th>product category</th>
+                    <th>product type</th>
+                    <th>product detail</th>
+                    <th>total usd</th>        
+                  </tr>
+                </thead>
+                <tbody id="salesTable">
+                  <!-- Data akan diisi melalui JavaScript -->
+                </tbody>
+              </table>
+              <div class="btn-table">
+                <button id="prevButton" onclick="prevButtonClick()">Previous</button>
+                <button id="nextButton" onclick="nextButtonClick()">Next</button>
+              </div>
+          </section>
+        </div>
+      </div>
+    </div>
+    <script src="js/script.js"></script>
+  </body>
+</html>
