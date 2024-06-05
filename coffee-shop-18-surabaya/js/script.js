@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', function () {
     .then(data => {
       let totalRevenue = 0;
       data.forEach(item => {
-        let unit_price = parseFloat(item.unit_price.replace(',', '.'));
-        totalRevenue += unit_price;
+        let revenue = parseFloat(item.total_usd.replace(',', '.'));
+        totalRevenue += revenue;
       });
       document.getElementById('totalRevenue').textContent = '$' + totalRevenue.toFixed(2);
     })
