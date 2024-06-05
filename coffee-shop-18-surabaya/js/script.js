@@ -1,130 +1,140 @@
-$(document).ready(function () {
-  $.getJSON('data.json', function (data) {
-    var totalRevenue = 0;
-    $.each(data, function (index, item) {
-      var unit_price = parseFloat(item.unit_price.replace(',', '.'));
-      totalRevenue += unit_price;
-    });
-    $('#totalRevenue').text('$' + totalRevenue.toFixed(2));
-  });
+document.addEventListener('DOMContentLoaded', function () {
+  // First Block: Calculate total revenue
+  fetch('data.json')
+    .then(response => response.json())
+    .then(data => {
+      let totalRevenue = 0;
+      data.forEach(item => {
+        let unit_price = parseFloat(item.unit_price.replace(',', '.'));
+        totalRevenue += unit_price;
+      });
+      document.getElementById('totalRevenue').textContent = '$' + totalRevenue.toFixed(2);
+    })
+
+  // Second Block: Calculate total transactions
+  fetch('data.json')
+    .then(response => response.json())
+    .then(data => {
+      let totalTransaksi = 0;
+      data.forEach(item => {
+        let transactionQty = parseFloat(item.transaction_qty.replace(',', '.'));
+        totalTransaksi += transactionQty;
+      });
+      document.getElementById('totalTransaksi').textContent = totalTransaksi.toFixed();
+    })
+
+  // Third Block: Calculate total unique orders
+  fetch('data.json')
+    .then(response => response.json())
+    .then(data => {
+      let uniqueOrderIds = {};
+      data.forEach(item => {
+        uniqueOrderIds[item.transaction_id] = true;
+      });
+      let totalOrders = Object.keys(uniqueOrderIds).length;
+      document.getElementById('totalOrders').textContent = totalOrders;
+    })
 });
 
-$(document).ready(function () {
-  $.getJSON('data.json', function (data) {
-    var totalTransaksi = 0;
-    $.each(data, function (index, item) {
-      var transactionQty = parseFloat(item.transaction_qty.replace(',', '.'));
-      totalTransaksi += transactionQty;
-    });
-    $('#totalTransaksi').text(totalTransaksi.toFixed());
-  });
-});
+document.addEventListener('DOMContentLoaded', function () {
+  fetch('data.json')
+    .then(response => response.json())
+    .then(data => {
+      let salesPerHour = {};
 
-$(document).ready(function () {
-  $.getJSON('data.json', function (data) {
-    var uniqueOrderIds = {};
-    $.each(data, function (index, item) {
-      uniqueOrderIds[item.transaction_id] = true;
-    });
-    var totalOrders = Object.keys(uniqueOrderIds).length;
-    $('#totalOrders').text(totalOrders);
-  });
-});
+      data.forEach(transaction => {
+        let hour = transaction.transaction_time_hour;
+        let totalUSD = parseFloat(transaction.total_usd);
 
-$(document).ready(function () {
-  $.getJSON('data.json', function (data) {
-    var salesPerHour = {};
+        if (!salesPerHour[hour]) {
+          salesPerHour[hour] = 0;
+        }
 
-    data.forEach(function (transaction) {
-      var hour = transaction.transaction_time_hour;
-      var totalUSD = parseFloat(transaction.total_usd);
+        salesPerHour[hour] += totalUSD;
+      });
 
-      if (!salesPerHour[hour]) {
-        salesPerHour[hour] = 0;
+      let labels = [];
+      let salesData = [];
+
+      for (let hour = 0; hour < 24; hour++) {
+        labels.push(hour + ':00');
+        salesData.push(salesPerHour[hour] ? salesPerHour[hour] : 0);
       }
 
-      salesPerHour[hour] += totalUSD;
-    });
-
-    var labels = [];
-    var salesData = [];
-
-    for (var hour = 0; hour < 24; hour++) {
-      labels.push(hour + ':00');
-      salesData.push(salesPerHour[hour] ? salesPerHour[hour] : 0);
-    }
-
-    var ctx = document.getElementById('coffeeSalesPerHourChart').getContext('2d');
-    var chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: 'Penjualan USD per Jam',
-            data: salesData,
-            fill: false,
-            backgroundColor: 'rgba(75, 54, 25, 0.2)',
-            borderColor: 'rgba(75, 54, 25, 1)',
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
+      let ctx = document.getElementById('coffeeSalesPerHourChart').getContext('2d');
+      let chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Penjualan USD per Jam',
+              data: salesData,
+              fill: false,
+              backgroundColor: 'rgba(75, 54, 25, 0.2)',
+              borderColor: 'rgba(75, 54, 25, 1)',
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
           },
         },
-      },
-    });
-  });
+      });
+    })
 });
 
-$(document).ready(function () {
-  $.getJSON('data.json', function (data) {
-    var transactionsPerDay = {};
+document.addEventListener('DOMContentLoaded', function () {
+  fetch('data.json')
+    .then(response => response.json())
+    .then(data => {
+      let transactionsPerDay = {};
 
-    data.forEach(function (transaction) {
-      var day = transaction.transaction_day;
+      data.forEach(transaction => {
+        let day = transaction.transaction_day;
 
-      if (!transactionsPerDay[day]) {
-        transactionsPerDay[day] = 0;
-      }
+        if (!transactionsPerDay[day]) {
+          transactionsPerDay[day] = 0;
+        }
 
-      transactionsPerDay[day] += parseInt(transaction.transaction_qty);
-    });
+        transactionsPerDay[day] += parseInt(transaction.transaction_qty);
+      });
 
-    var labels = Object.keys(transactionsPerDay);
-    var transactionQtys = Object.values(transactionsPerDay);
+      let labels = Object.keys(transactionsPerDay);
+      let transactionQtys = Object.values(transactionsPerDay);
 
-    var ctx = document.getElementById('transactionsQtyPerDayChart').getContext('2d');
-    var chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: 'Total Qty Terjual per Hari',
-            data: transactionQtys,
-            fill: false,
-            backgroundColor: 'rgba(75, 54, 25, 0.2)',
-            borderColor: 'rgba(75, 54, 25, 1)',
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-            stepSize: 1,
+      let ctx = document.getElementById('transactionsQtyPerDayChart').getContext('2d');
+      let chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Total Qty Terjual per Hari',
+              data: transactionQtys,
+              fill: false,
+              backgroundColor: 'rgba(75, 54, 25, 0.2)',
+              borderColor: 'rgba(75, 54, 25, 1)',
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              stepSize: 1,
+            },
           },
         },
-      },
-    });
-  });
+      });
+    })
 });
+
 
 fetch('data.json')
   .then((response) => response.json())
@@ -390,18 +400,6 @@ async function initChart() {
 // Panggil fungsi untuk menginisialisasi chart saat halaman dimuat
 document.addEventListener('DOMContentLoaded', initChart);
 
-// total revenue
-$(document).ready(function () {
-  $.getJSON('data.json', function (data) {
-    var totalRevenue = 0;
-    $.each(data, function (index, item) {
-      var unit_price = parseFloat(item.unit_price.replace(',', '.'));
-      var transaction_qty = parseFloat(item.transaction_qty.replace(',', '.'));
-      totalRevenue += unit_price * item.transaction_qty;
-    });
-    $('#totalRevenue').text('$' + totalRevenue.toFixed(2));
-  });
-});
 fetch('data.json')
   .then((response) => response.json())
   .then((data) => {
@@ -494,86 +492,84 @@ fetch('data.json')
 
 
   // pie chart dan filter
-  $(document).ready(function() {
-    $.getJSON('data.json', function(data) {
-      const jsonData = data;
+  document.addEventListener('DOMContentLoaded', function() {
+    fetch('data.json')
+      .then(response => response.json())
+      .then(data => {
+        const jsonData = data;
   
-      function renderChart(data) {
-        const ctx = document.getElementById('pieChart').getContext('2d');
-        if (window.myPieChart) {
-          window.myPieChart.destroy();
-        }
+        function renderChart(data) {
+          const ctx = document.getElementById('pieChart').getContext('2d');
+          if (window.myPieChart) {
+            window.myPieChart.destroy();
+          }
   
-        const storeLocations = {};
-        data.forEach(item => {
-          storeLocations[item.store_location] = storeLocations[item.store_location] || [];
-          storeLocations[item.store_location].push(item.transaction_id);
-        });
+          const storeLocations = {};
+          data.forEach(item => {
+            storeLocations[item.store_location] = storeLocations[item.store_location] || [];
+            storeLocations[item.store_location].push(item.transaction_id);
+          });
   
-        const labels = Object.keys(storeLocations);
-        const values = labels.map(label => storeLocations[label].length);
+          const labels = Object.keys(storeLocations);
+          const values = labels.map(label => storeLocations[label].length);
   
-        window.myPieChart = new Chart(ctx, {
-          type: 'pie',
-          data: {
-            labels: labels,
-            datasets: [{
-              label: '# of Transactions',
-              data: values,
-              backgroundColor: [
-                'rgba(60,42,30, 0.2)',
-                'rgba(60,42,30, 0.5)',
-                'rgba(60,42,30, 1)',
-                // 'rgba(75, 192, 192, 0.2)',
-                // 'rgba(153, 102, 255, 0.2)',
-                // 'rgba(255, 159, 64, 0.2)'
-              ],
-              borderColor: [
-                'rgba(60,42,30, 1)',
-                'rgba(60,42,30, 1)',
-                'rgba(60,42,30, 1)',
-                // 'rgba(75, 192, 192, 1)',
-                // 'rgba(153, 102, 255, 1)',
-                // 'rgba(255, 159, 64, 1)'
-              ],
-              borderWidth: 1
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: {
-                position: 'top',
-              },
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    const label = context.label || '';
-                    const count = context.raw;
-                    const transactionIds = storeLocations[label];
-                    return `${label}: ${count} (Transactions: ${transactionIds.join(', ')})`;
+          window.myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: '# of Transactions',
+                data: values,
+                backgroundColor: [
+                  'rgba(60,42,30, 0.2)',
+                  'rgba(60,42,30, 0.5)',
+                  'rgba(60,42,30, 1)',
+                ],
+                borderColor: [
+                  'rgba(60,42,30, 1)',
+                  'rgba(60,42,30, 1)',
+                  'rgba(60,42,30, 1)',
+                ],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'top',
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function(context) {
+                      const label = context.label || '';
+                      const count = context.raw;
+                      const transactionIds = storeLocations[label];
+                      return `${label}: ${count} (Transactions: ${transactionIds.join(', ')})`;
+                    }
                   }
                 }
               }
             }
-          }
+          });
+        }
+  
+        function filterData(searchValue) {
+          return jsonData.filter(item =>
+            item.store_location.toLowerCase().includes(searchValue) ||
+            item.transaction_id.includes(searchValue)
+          );
+        }
+  
+        document.getElementById('search').addEventListener('input', function() {
+          const searchValue = this.value.toLowerCase();
+          const filteredData = filterData(searchValue);
+          renderChart(filteredData);
         });
-      }
   
-      function filterData(searchValue) {
-        return jsonData.filter(item => 
-          item.store_location.toLowerCase().includes(searchValue) ||
-          item.transaction_id.includes(searchValue)
-        );
-      }
-  
-      $('#search').on('input', function() {
-        const searchValue = this.value.toLowerCase();
-        const filteredData = filterData(searchValue);
-        renderChart(filteredData);
-      });
-  
-      renderChart(jsonData);
-    });
+        renderChart(jsonData);
+      })
+      
   });
+  
   
