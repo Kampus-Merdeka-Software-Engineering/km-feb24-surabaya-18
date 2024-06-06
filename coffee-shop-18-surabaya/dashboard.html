@@ -39,14 +39,12 @@
               <option value="asc">Ascending</option>
             </select>
           </div>
-          <div class="search-container">
-            <label for="search">Search Store:</label>
-            <input type="text" id="search" name="search" placeholder="Type to search" list="storeList" />
-            <datalist id="storeList">
-              <option value="Astoria">
-              <option value="Hell's Kitchen">
-              <option value="Lower Manhattan">
-            </datalist>
+          <div>
+            <label for="locationFilter">Filter by Location:</label>
+            <select id="locationFilter">
+              <option value="">All Locations</option>
+              <!-- Options will be added dynamically -->
+            </select>
           </div>
           <div class="chart-container">
             <canvas id="pieChart"></canvas>
@@ -134,9 +132,7 @@
             <div class="chart-text">Revenue Distribution of Product Types</div>
             <canvas id="myChart1"></canvas>
           </div>
-          <!-- <div id="chartContainer">
-            <canvas id="pieChart"></canvas>
-          </div> -->
+       
           <div class="container-revenue">
             <h3>Revenue</h3>
             <canvas id="revenue"></canvas>
